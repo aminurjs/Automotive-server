@@ -33,14 +33,28 @@ app.post("/addproduct", async (req, res) => {
   const result = await productsCollection.insertOne(product);
   res.send(result);
 });
-app.put("/update/:id", (req, res) => {
+app.put("/update/:id", async (req, res) => {
   const id = req.params.id;
   const product = req.body;
   const filter = { _id: new ObjectId(id) };
   const options = { upsert: true };
   const updateProduct = {
-    $set: {},
+    $set: {
+      image: product.image,
+      name: product.name,
+      brand_name: product.brand_name,
+      type: product.type,
+      price: product.price,
+      rating: product.rating,
+      short_description: product.short_description,
+    },
   };
+  const result = await productsCollection.updateOne(
+    filter,
+    updateProduct,
+    options
+  );
+  res.send(result);
 });
 
 async function run() {
