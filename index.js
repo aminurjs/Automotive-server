@@ -20,6 +20,29 @@ const client = new MongoClient(uri, {
   },
 });
 
+const productsCollection = client.db("insertDB").collection("products");
+
+app.get("/products", async (req, res) => {
+  const products = await productsCollection.find().toArray();
+  res.send(products);
+});
+
+app.post("/addproduct", async (req, res) => {
+  const product = req.body;
+  console.log(req.body);
+  const result = await productsCollection.insertOne(product);
+  res.send(result);
+});
+app.put("/update/:id", (req, res) => {
+  const id = req.params.id;
+  const product = req.body;
+  const filter = { _id: new ObjectId(id) };
+  const options = { upsert: true };
+  const updateProduct = {
+    $set: {},
+  };
+});
+
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
