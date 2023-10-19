@@ -21,7 +21,19 @@ const client = new MongoClient(uri, {
 });
 
 const productsCollection = client.db("insertDB").collection("products");
+const brandsCollection = client.db("insertDB").collection("brands");
+const cartCollection = client.db("insertDB").collection("cart");
 
+app.get("/brands", async (req, res) => {
+  const brands = await brandsCollection.find().toArray();
+  res.send(brands);
+});
+app.get("/brands/:name", async (req, res) => {
+  const name = req.params.name;
+  const query = { brand_name: name };
+  const brand = await brandsCollection.findOne(query);
+  res.send(brand);
+});
 app.get("/products", async (req, res) => {
   const products = await productsCollection.find().toArray();
   res.send(products);
@@ -45,6 +57,17 @@ app.post("/addproduct", async (req, res) => {
   const result = await productsCollection.insertOne(product);
   res.send(result);
 });
+
+app.get("/carts", async (req, res) => {
+  const carts = await cartCollection.find().toArray();
+  res.send(carts);
+});
+
+app.post("/addcart", async (req, res) => {
+  const product = req.body;
+  const result = await cartCollection.insertOne(product);
+  res.send(result);
+});
 app.put("/update/:id", async (req, res) => {
   const id = req.params.id;
   const product = req.body;
@@ -54,13 +77,14 @@ app.put("/update/:id", async (req, res) => {
     $set: {
       image: product.image,
       name: product.name,
-      brand_name: product.brand_name,
+      brand_name: product.brandName,
       type: product.type,
       price: product.price,
       rating: product.rating,
       description: product.description,
     },
   };
+  console.log(updateProduct);
   const result = await productsCollection.updateOne(
     filter,
     updateProduct,
