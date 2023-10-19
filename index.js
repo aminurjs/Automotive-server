@@ -68,6 +68,12 @@ app.post("/addcart", async (req, res) => {
   const result = await cartCollection.insertOne(product);
   res.send(result);
 });
+app.delete("/carts/remove/:id", async (req, res) => {
+  const id = req.params.id;
+  const query = { _id: new ObjectId(id) };
+  const result = await cartCollection.deleteOne(query);
+  res.send(result);
+});
 app.put("/update/:id", async (req, res) => {
   const id = req.params.id;
   const product = req.body;
